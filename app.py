@@ -1,3 +1,4 @@
+import dotenv
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from flask_sqlalchemy import SQLAlchemy
@@ -6,8 +7,6 @@ import os
 import openai
 import logging
 from flask_migrate import Migrate
-
-
 
 # Add this line at the beginning of your app.py file to configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -59,8 +58,8 @@ def delete_data():
 
 
 # Initialize OpenAI API
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
+openai_api_key = os.getenv('OPENAI_API_KEY')
+openai.api_key = openai_api_key
 
 # Define SQLAlchemy models
 class PastConversation(db.Model):
@@ -149,7 +148,7 @@ def get_response():
 def get_chatbot_response(message):
     try:
         response = openai.chat.completions.create(
-            model="ft:gpt-3.5-turbo-0613:personal::8sFU1bio",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are chatting with a medical chatbot."},
                 {"role": "user", "content": message}
