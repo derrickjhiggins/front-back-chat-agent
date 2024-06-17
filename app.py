@@ -7,6 +7,7 @@ import os
 import openai
 import logging
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 # Add this line at the beginning of your app.py file to configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -14,6 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+CORS(app)
 
 # Configure SQLite database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -128,6 +130,7 @@ def index():
 def get_response():
     try:
         user_input = request.json['message']
+        app.logger.debug('Received message from frontend: %s', user_input)
         chatbot_response, api_response = get_chatbot_response(user_input)
 
         # Store conversation in the database
@@ -158,6 +161,7 @@ def get_chatbot_response(message):
         )
         api_response = response.to_dict()
         chatbot_message = response.choices[0].message.content
+        print(f"TYPES: api_reponse: {type(api_response)}\n chatbot_message: {type(chatbot_message)}")
         
         if not chatbot_message:
             chatbot_message = "I'm sorry, but I couldn't generate a complete response. Could you please provide more details or try asking a more specific question?"
